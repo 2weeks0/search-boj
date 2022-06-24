@@ -1,15 +1,26 @@
 import { useState } from "react";
 
+import PropsTypes from "prop-types";
+
+const propsType = {
+  active: PropsTypes.bool,
+  onClick: PropsTypes.func,
+};
+
+const defaultProps = {
+  active: false,
+  onClick: () => console.error("FilterButton에 onClick 을 넘겨주세요."),
+};
+
 export default function FilterButton(props) {
-  const [active, setActive] = useState(false);
-
-  const activeClass = `opacity-${active ? "100" : "25"}`;
-
-  const handleClick = () => setActive((prev) => !prev);
+  const activeClass = `opacity-${props.active ? "100" : "25"}`;
 
   return (
-    <button className={`btn ${activeClass} w-75`} onClick={handleClick}>
+    <button className={`btn ${activeClass} w-75`} onClick={props.onClick}>
       {props.children}
     </button>
   );
 }
+
+FilterButton.prototype = propsType;
+FilterButton.defaultProps = defaultProps;
