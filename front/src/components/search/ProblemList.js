@@ -43,16 +43,27 @@ export default function ProblemList() {
   }, [inView, loading]);
 
   if (!data) {
-    return <h1>못 찾겠어요.</h1>;
+    return <h1>{loading ? "찾는 중..." : "데이터가 없어요."}</h1>;
   }
+
+  const handleClick = (problemId) => {
+    const newWindow = window.open(
+      `https://www.acmicpc.net/problem/${problemId}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+    if (newWindow) {
+      newWindow.opener = null;
+    }
+  };
 
   const Tbody = data.items.map((it, idx) =>
     idx === data.items.length - 20 ? (
-      <tr ref={ref} key={idx}>
+      <tr ref={ref} key={idx} onClick={() => handleClick(it.problemId)}>
         <ProblemInfo problem={it} />
       </tr>
     ) : (
-      <tr key={idx}>
+      <tr key={idx} onClick={() => handleClick(it.problemId)}>
         <ProblemInfo problem={it} />
       </tr>
     )
