@@ -19,11 +19,11 @@ export async function searchUser(id) {
   }
 }
 
-export async function search({ team, tierFilter, page }) {
+export async function search({ team, tierFilter, page, sort }) {
   const options = {
     method: "GET",
     url: `${baseURL}/search/problem`,
-    params: { query: getQuery(team, tierFilter), page },
+    params: { query: getQuery(team, tierFilter), page, sort: sort.key, direction: sort.direction },
     headers: { "Content-Type": "application/json" },
   };
 

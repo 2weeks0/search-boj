@@ -6,6 +6,9 @@ import { selectTeam } from "../../store/slices/teamSlice";
 import { selectTierFilter } from "../../store/slices/filterSlice";
 import { search } from "../../api";
 import ProblemInfo from "./ProblemInfo";
+import ProblemListHeaderContainer from "./ProblemListHeaderContainer";
+import { selectSort } from "../../store/slices/sortSlice";
+
 
 export default function ProblemList() {
   const [loading, setLoading] = useState(false);
@@ -14,16 +17,17 @@ export default function ProblemList() {
 
   const team = useSelector(selectTeam);
   const tierFilter = useSelector(selectTierFilter);
+  const sort = useSelector(selectSort);
   const [ref, inView] = useInView();
 
   
   useEffect(() => {
     setData(undefined);
-  }, [tierFilter]);
+  }, [tierFilter, sort]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const newData = await search({ team, page, tierFilter });
+    const newData = await search({ team, page, tierFilter, sort });
     setData((prev) => {
       if (!prev) {
         return newData;
@@ -37,7 +41,7 @@ export default function ProblemList() {
       };
     });
     setTimeout(() => setLoading(false), 1000);
-  }, [team, page, tierFilter]);
+  }, [team, page, tierFilter, sort]);
 
   useEffect(() => {
     fetchData();
@@ -76,16 +80,8 @@ export default function ProblemList() {
     )
   );
   return (
-    <table>
-      <thead>
-        <tr>
-          <td>번호</td>
-          <td>티어</td>
-          <td>이름</td>
-          <td>정답자 수</td>
-          <td>평균 시도 횟수</td>
-        </tr>
-      </thead>
+    <table className="table">
+      <ProblemListHeaderContainer/>
       <tbody>{Tbody}</tbody>
     </table>
   );
