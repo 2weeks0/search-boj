@@ -1,45 +1,58 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useInView } from "react-intersection-observer";
 
 import { selectTeam } from "../../store/slices/teamSlice";
-import { searchThunk, selectSearched, selectPage, plusPage } from "../../store/slices/searchSlice";
+import { search } from "../../api";
 import ProblemInfo from "./ProblemInfo";
 
 export default function ProblemList() {
   const [loading, setLoading] = useState(false);
-  const page = useSelector(selectPage);
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState(undefined);
 
-  const searched = useSelector(selectSearched);
   const team = useSelector(selectTeam);
   const [ref, inView] = useInView();
 
-  const dispatch = useDispatch();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const newData = await search({ team, page });
+    setData((prev) => {
+      if (!prev) {
+        return newData;
+      }
+      const items = [...prev.items, ...newData.items];
+      return {
+        count: prev.count,
+        items: items.filter(
+          (v, idx) => idx === items.findIndex((it) => it.problemId === v.problemId)
+        ),
+      };
+    });
+    setTimeout(() => setLoading(false), 1000);
+  }, [team, page]);
 
   useEffect(() => {
-    console.log("page", page);
-    setLoading(true);
-    dispatch(searchThunk({ team, page }));
-    setLoading(false);
-  }, [dispatch, team, page]);
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (inView && !loading) {
-      dispatch(plusPage());
+      setPage((prev) => prev + 1);
     }
-  }, [dispatch, inView, loading]);
+  }, [inView, loading]);
 
-  if (!searched) {
+  if (!data) {
     return <h1>못 찾겠어요.</h1>;
   }
 
-  const Tbody = searched.items.map((it, idx) =>
-    idx === searched.items.length - 1 ? (
-      <tr ref={ref} key={it.problemId}>
+  const Tbody = data.items.map((it, idx) =>
+    idx === data.items.length - 20 ? (
+      <tr ref={ref} key={idx}>
         <ProblemInfo problem={it} />
       </tr>
     ) : (
-      <tr key={it.problemId}>
+      <tr key={idx}>
         <ProblemInfo problem={it} />
       </tr>
     )
