@@ -1,12 +1,9 @@
 import PropsTypes from "prop-types";
 import { useDispatch } from "react-redux";
-import styled from "styled-components";
 
 import { addTeammate, removeTeammate } from "../../store/slices/teamSlice";
 
-const TierImg = styled.img`
-  width: 100px;
-`;
+import TierImage from "../TierImage";
 
 const propTypes = {
   user: PropsTypes.object,
@@ -27,10 +24,7 @@ export default function UserInfo(props) {
   return props.user ? (
     <div style={props.style}>
       <h3>{props.user.handle}</h3>
-      <TierImg
-        src={`https://d2gd6pc034wcta.cloudfront.net/tier/${props.user.tier}.svg`}
-        alt="tier"
-      />
+      <TierImage tier={props.user.tier} />
       <br />
       <button onClick={handleClick}>{props.isTeammate ? "팀원 해제" : "팀원 등록"}</button>
     </div>
