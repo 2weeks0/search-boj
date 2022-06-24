@@ -19,14 +19,11 @@ export async function searchUser(id) {
   }
 }
 
-export async function search({ team, page }) {
-  let query = "";
-  team.forEach((it) => query += `!s@${it.handle}`);
-
+export async function search({ team, tierFilter, page }) {
   const options = {
     method: "GET",
     url: `${baseURL}/search/problem`,
-    params: { query, page },
+    params: { query: getQuery(team, tierFilter), page },
     headers: { "Content-Type": "application/json" },
   };
 
@@ -37,4 +34,22 @@ export async function search({ team, page }) {
     console.error(e);
     return null;
   }
+}
+
+function getQuery(team, tierFilter) {
+  let query = "";
+  team.forEach((it) => (query += `!s@${it.handle}`));
+  query += " ";
+
+  if (tierFilter.length !== 0) {
+    query += "(";
+    tierFilter.forEach((it, idx) => {
+      query += `*${it}`;
+      if (idx !== tierFilter.length - 1) {
+        query += "|";
+      }
+    });
+    query += ")";
+  }
+  return query;
 }

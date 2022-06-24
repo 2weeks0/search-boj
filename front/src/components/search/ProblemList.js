@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useInView } from "react-intersection-observer";
 
 import { selectTeam } from "../../store/slices/teamSlice";
+import { selectTierFilter } from "../../store/slices/filterSlice";
 import { search } from "../../api";
 import ProblemInfo from "./ProblemInfo";
 
@@ -12,11 +13,17 @@ export default function ProblemList() {
   const [data, setData] = useState(undefined);
 
   const team = useSelector(selectTeam);
+  const tierFilter = useSelector(selectTierFilter);
   const [ref, inView] = useInView();
+
+  
+  useEffect(() => {
+    setData(undefined);
+  }, [tierFilter]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const newData = await search({ team, page });
+    const newData = await search({ team, page, tierFilter });
     setData((prev) => {
       if (!prev) {
         return newData;
@@ -30,7 +37,7 @@ export default function ProblemList() {
       };
     });
     setTimeout(() => setLoading(false), 1000);
-  }, [team, page]);
+  }, [team, page, tierFilter]);
 
   useEffect(() => {
     fetchData();
