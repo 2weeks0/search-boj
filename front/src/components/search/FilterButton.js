@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import PropsTypes from "prop-types";
 
 const propsType = {
